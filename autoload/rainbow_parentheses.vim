@@ -46,12 +46,14 @@ endfunc
 cal s:extend()
 
 func! rainbow_parentheses#activate()
-	let id = 1
-	for [ctermfg, guifg] in s:colorpairs
-		exe 'hi default level'.id.'c ctermfg='.ctermfg.' guifg='.guifg
-		let id += 1
-	endfor
-	let s:active = 1
+  if &ft != 'html'
+    let id = 1
+    for [ctermfg, guifg] in s:colorpairs
+      exe 'hi default level'.id.'c ctermfg='.ctermfg.' guifg='.guifg
+      let id += 1
+    endfor
+    let s:active = 1
+  endif
 endfunc
 
 func! rainbow_parentheses#clear()
@@ -97,21 +99,23 @@ cal s:cluster()
 let s:types = [['(',')'],['\[','\]'],['{','}'],['<','>']]
 
 func! rainbow_parentheses#load(...)
-	let [level, grp, alllvls, type] = ['', '', [], s:types[a:1]]
-	for each in range(1, s:max)
-		cal add(alllvls, 'level'.each)
-	endfor
-	if !exists('b:loaded')
-		let b:loaded = [0,0,0,0]
-	endif
-	let b:loaded[a:1] = b:loaded[a:1] ? 0 : 1
-	for each in range(1, s:max)
-		let region = b:loaded[a:1] ? 'level'.each : 'level'.each.'none'
-		let grp = b:loaded[a:1] ? 'level'.each.'c' : 'Normal'
-		let cmd = 'syn region %s matchgroup=%s start=/%s/ end=/%s/ contains=TOP,%s,NoInParens'
-		exe printf(cmd, region, grp, type[0], type[1], join(alllvls, ','))
-		cal remove(alllvls, 0)
-	endfor
+  if &ft != 'html'
+    let [level, grp, alllvls, type] = ['', '', [], s:types[a:1]]
+    for each in range(1, s:max)
+      cal add(alllvls, 'level'.each)
+    endfor
+    if !exists('b:loaded')
+      let b:loaded = [0,0,0,0]
+    endif
+    let b:loaded[a:1] = b:loaded[a:1] ? 0 : 1
+    for each in range(1, s:max)
+      let region = b:loaded[a:1] ? 'level'.each : 'level'.each.'none'
+      let grp = b:loaded[a:1] ? 'level'.each.'c' : 'Normal'
+      let cmd = 'syn region %s matchgroup=%s start=/%s/ end=/%s/ contains=TOP,%s,NoInParens'
+      exe printf(cmd, region, grp, type[0], type[1], join(alllvls, ','))
+      cal remove(alllvls, 0)
+    endfor
+  endif
 endfunc
 
 " vim:ts=2:sw=2:sts=2
